@@ -5,8 +5,14 @@ import com.tatf.core.browser.IBrowser;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import com.tatf.core.verification.IVerify;
 import org.junit.jupiter.api.Order;
+import com.tatf.adminces.modules.acceso.data.AccesoData;
+import com.tatf.adminces.modules.acceso.task.AccesoTask;
+import com.tatf.adminces.modules.registro.data.RegistroData;
+import com.tatf.adminces.modules.registro.task.RegistroTask;
+import com.tatf.adminces.modules.login.data.LoginData;
+import com.tatf.adminces.modules.login.task.LoginTask;
+import com.tatf.adminces.modules.home.task.HomeTask;
 
 @Order(1)
 public class CrearAdministradorTest {
@@ -25,44 +31,21 @@ public class CrearAdministradorTest {
 
     @Test
     void crearCuentaAdministrador() {
-        browser.interaction().navigateTo("http://cestore.ces.com.uy/adminces/");
-        browser.find().id("pass").write("3)ea60e0be3ba12c6ecd%7297868%5c4");
-        browser.find().xpath("//button[contains(text(),'Ingresar')]").click();
-        browser.find().link("Registrarse").click();
+        AccesoTask acceso = new AccesoTask(browser);
+        acceso.accederAlSistema(AccesoData.URL, AccesoData.CLAVE_ACCESO);
 
-        String correo = "Nancy123@test.com";
-        String contrasena = "Admin12345";
+        String correo = RegistroData.EMAIL;
+        String contrasena = RegistroData.CONTRASENA;
 
-        browser.find().css("input[placeholder='Nombre']").write("Nancy");
-        browser.find().css("input[placeholder='Apellido']").write("Cantos");
-        browser.find().css("input[placeholder='Email']").write(correo);
-        browser.find().css("input[placeholder='Contraseña']").write(contrasena);
-        browser.find().css("input[placeholder='Repetir contraseña']").write(contrasena);
-        browser.find().css("input[placeholder='Pais nacimiento']").write("Uruguay");
-        browser.find().xpath("//button[contains(text(),'Registrarse')]").click();
-        browser.wait("//*[normalize-space()='Usuario creado.']").xpath();
+        RegistroTask registro = new RegistroTask(browser);
+        registro.registrarAdministrador(RegistroData.NOMBRE,RegistroData.APELLIDO,correo,contrasena,RegistroData.PAIS);
+        registro.verificarRegistro(RegistroData.MENSAJE_CONFIRMACION);
 
-        String mensajeObtenido = browser.find().xpath("//*[normalize-space()='Usuario creado.']").getText();
-        IVerify.create().verify("Usuario creado.",mensajeObtenido,"No se mostró el mensaje de confirmación esperado.");
+        LoginTask login = new LoginTask(browser);
+        login.iniciarSesion(correo, contrasena);
+        login.verificarInicioSesion(LoginData.MENSAJE_CONFIRMACION);
+        HomeTask home = new HomeTask(browser);
+        home.verificarPanelAdministrador();
 
-        browser.find().xpath("//button[normalize-space()='OK']").click();
-        browser.find().link("Iniciar sesión").click();
-        browser.find().css("input[placeholder='Email']").write(correo);
-        browser.find().css("input[placeholder='Contraseña']").write(contrasena);
-        browser.find().xpath("//button[contains(text(),'Iniciar Sesión')]").click();
-        browser.wait("//*[normalize-space()='Sesión iniciada.']").xpath();
-
-        String mensajeSesion = browser.find().xpath("//*[normalize-space()='Sesión iniciada.']").getText();
-
-        IVerify.create().verify("Sesión iniciada.",mensajeSesion,"No se mostró la confirmación de inicio de sesión.");
-
-        browser.find().xpath("//button[normalize-space()='OK']").click();
-        browser.wait("Crear usuario").link();
-
-        boolean pantallaPrincipalVisible = browser.find().link("Crear usuario").isDisplayed();
-
-        IVerify.create().verifyTrue(pantallaPrincipalVisible,"No se accedió al panel principal del Administrador.");
-
-        browser.wait(5).sleep();
     }
 }

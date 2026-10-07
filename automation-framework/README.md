@@ -1,38 +1,38 @@
-# Estructura del proyecto
+# AdminCES — Aplicando POM
 
-## Interfaces
-
-| Entidad  | Descripción                                                                                                       |
-|----------|-------------------------------------------------------------------------------------------------------------------|
-| IBrowser | Interfaz que define operaciones comunes para la gestión del navegador y la espera de elementos en una página web. |
-| IVerify  | Interfaz que define métodos para verificar resultados esperados con obtenidos y agregar mensajes asociados.       |
-
-## Patrones aplicados
-
-| Patrón     | Entidad                 | Descripción                                                               |
-|------------|-------------------------|---------------------------------------------------------------------------|
-| Factory    | DriverManagerFactory    | Clase encargada de indicar que driver se debe retornar.                   |
-| Singlenton | DriverManagerSinglenton | Clase encargada de mantener una sola instancia configurada con un driver. |
-
-## Pruebas de AdminCES
+Adaptación de las cuatro pruebas de AdminCES al patrón Page Object Model, con Java, Maven, Selenium y JUnit.
 
 Aplicación: http://cestore.ces.com.uy/adminces/
 
-Las pruebas están en `src/test/java/com/tatf/tests` y utilizan `IBrowser` para interactuar con la aplicación e `IVerify` para verificar los resultados.
+## Estructura
 
-| Orden | Clase | Prueba |
-|-------|-------|--------|
-| 1 | CrearAdministradorTest | Crear cuenta Administrador y comprobar el inicio de sesión. |
-| 2 | ReiniciarContrasenaTest | Reiniciar contraseña y comprobar el inicio de sesión con la nueva contraseña. |
-| 3 | CrearTesterTest | Crear cuenta Tester y verificar sus datos en la tabla de usuarios. |
-| 4 | EliminarTesterTest | Crear un Tester, eliminarlo y verificar que ya no aparezca en la tabla. |
+Las clases de AdminCES están en `src/test/java/com/tatf/adminces/modules`, organizadas por módulo:
 
-El orden se define con `@Order` y el archivo `src/test/resources/junit-platform.properties`.
+- `pom`: localizadores, acciones y esperas de cada pantalla.
+- `task`: secuencias de acciones y verificaciones.
+- `data`: datos de prueba y mensajes esperados.
 
-### Ejecución
+Los tests están en `src/test/java/com/tatf/tests` y utilizan las tareas y los datos. Las verificaciones se realizan con `IVerify`.
 
-En IntelliJ, seleccionar las cuatro clases y ejecutarlas con **Run**. Las pruebas utilizan JUnit y abren Chrome mediante el framework.
+## Pruebas
 
-### Guiones
+| Orden |  Clase                  | Caso                                                                                  |
+|-------|-------------------------|---------------------------------------------------------------------------------------|
+| 1     | CrearAdministradorTest  | Crear un administrador y comprobar el inicio de sesión y el acceso al panel.          |
+| 2     | ReiniciarContrasenaTest | Reiniciar la contraseña, cerrar sesión y comprobar el acceso con la nueva contraseña. |
+| 3     | CrearTesterTest         | Crear un tester y verificar sus datos en la tabla de usuarios.                        |
+| 4     | EliminarTesterTest      | Crear un tester, eliminarlo y comprobar que no aparezca en la tabla.                  |
 
-Los pasos y las verificaciones de cada prueba están en [Guiones.md](Guiones.md).
+El orden se configura con `@Order` y `src/test/resources/junit-platform.properties`.
+
+## Ejecución
+
+1. Abrir `automation-framework` en IntelliJ como proyecto Maven.
+2. Revisar los datos antes de ejecutar:
+   - Usar correos no registrados en `RegistroData.EMAIL`, `CrearTesterData.EMAIL` y `EliminarTesterData.EMAIL`.
+   - En `ReinicioData`, indicar la contraseña actual de la cuenta y una nueva contraseña distinta. Después de una ejecución exitosa, la cuenta queda con la nueva contraseña.
+3. Seleccionar las cuatro clases de AdminCES y ejecutarlas con **Run**. Las pruebas abren Chrome.
+
+`TestForm`, `ConsultarInmobiliariaTest` y las clases del paquete `soluciones` son ejemplos anteriores y no forman parte de estas cuatro pruebas.
+
+Los guiones están en [Guiones.md](Guiones.md).
